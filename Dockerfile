@@ -44,4 +44,4 @@ RUN R -e "BiocManager::install(c('biomaRt','GenomicFeatures','Gviz','rtracklayer
 RUN R -e "library(githubinstall); githubinstall(c('FusionExpressionPlot'),ask=F)"
 RUN R -e "install.packages(c('ggplot2'), repos='http://cran.rstudio.com/')"
 
-ADD app/Macrophage /srv/shiny-server/
+ADD app /srv/shiny-server/
