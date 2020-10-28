@@ -6,3 +6,4 @@ WARNING: git-filter-branch has a glut of gotchas generating mangled history
 	 set FILTER_BRANCH_SQUELCH_WARNING=1.
 Proceeding with filter-branch...
 
+client.json
