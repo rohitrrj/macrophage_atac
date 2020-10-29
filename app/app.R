@@ -111,6 +111,16 @@ server<-function(input,output,session){
     )
   })
   
+  output$hover_info <- renderPrint({
+    if(!is.null(input$plot_hover)){
+      hover=input$plot_hover
+      dist=sqrt((hover$x-vstNormalizedCounts_Macrophage$Group)^2+(hover$y-vstNormalizedCounts_Macrophage$vstNormalizedCounts)^2)
+      cat("SampleID: \n")
+      if(min(dist) < 3)
+        vstNormalizedCounts_Macrophage$SampleID[which.min(dist)]
+    }
+  })
+  
   output$Track      <-  renderPlot({
     distflank<-input$Flank
     if(grepl(":", input$Gene)){
