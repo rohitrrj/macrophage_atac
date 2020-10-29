@@ -13,14 +13,14 @@ library(FusionExpressionPlot)
 library(ggplot2)
 # library(DESeq2)
 
-HC_1<-"http://web.stanford.edu/~jadhav/Tracks/HC_1.bw"
-HC_2<-"http://web.stanford.edu/~jadhav/Tracks/HC_2.bw"
-HC_3<-"http://web.stanford.edu/~jadhav/Tracks/HC_3.bw"
-HC_4<-"http://web.stanford.edu/~jadhav/Tracks/HC_4.bw"
-CAD_1<-"http://web.stanford.edu/~jadhav/Tracks/CAD_1.bw"
-CAD_2<-"http://web.stanford.edu/~jadhav/Tracks/CAD_2.bw"
-CAD_3<-"http://web.stanford.edu/~jadhav/Tracks/CAD_3.bw"
-CAD_4<-"http://web.stanford.edu/~jadhav/Tracks/CAD_4.bw"
+# HC_1<-"http://web.stanford.edu/~jadhav/Tracks/HC_1.bw"
+# HC_2<-"http://web.stanford.edu/~jadhav/Tracks/HC_2.bw"
+# HC_3<-"http://web.stanford.edu/~jadhav/Tracks/HC_3.bw"
+# HC_4<-"http://web.stanford.edu/~jadhav/Tracks/HC_4.bw"
+# CAD_1<-"http://web.stanford.edu/~jadhav/Tracks/CAD_1.bw"
+# CAD_2<-"http://web.stanford.edu/~jadhav/Tracks/CAD_2.bw"
+# CAD_3<-"http://web.stanford.edu/~jadhav/Tracks/CAD_3.bw"
+# CAD_4<-"http://web.stanford.edu/~jadhav/Tracks/CAD_4.bw"
 
 # HC_1<-"/mnt/Projects/Tuantuan/Tracks/HC_1.bw"
 # HC_2<-"/mnt/Projects/Tuantuan/Tracks/HC_2.bw"
@@ -30,6 +30,15 @@ CAD_4<-"http://web.stanford.edu/~jadhav/Tracks/CAD_4.bw"
 # CAD_2<-"/mnt/Projects/Tuantuan/Tracks/CAD_2.bw"
 # CAD_3<-"/mnt/Projects/Tuantuan/Tracks/CAD_3.bw"
 # CAD_4<-"/mnt/Projects/Tuantuan/Tracks/CAD_4.bw"
+
+HC_1<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_1.bw"
+HC_2<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_2.bw"
+HC_3<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_3.bw"
+HC_4<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_4.bw"
+CAD_1<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_1.bw"
+CAD_2<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_2.bw"
+CAD_3<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_3.bw"
+CAD_4<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_4.bw"
 
 # fitqwr2.cqn<-readRDS("./Macrophage_fitqwr2cqn.Rds")
 # tryCatch(
