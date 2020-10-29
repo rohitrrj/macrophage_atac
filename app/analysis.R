@@ -31,14 +31,14 @@ library(ggplot2)
 # CAD_3<-"/mnt/Projects/Tuantuan/Tracks/CAD_3.bw"
 # CAD_4<-"/mnt/Projects/Tuantuan/Tracks/CAD_4.bw"
 
-HC_1<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_1.bw"
-HC_2<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_2.bw"
-HC_3<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_3.bw"
-HC_4<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_4.bw"
-CAD_1<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_1.bw"
-CAD_2<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_2.bw"
-CAD_3<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_3.bw"
-CAD_4<-"gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_4.bw"
+HC_1<-"https://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_1.bw"
+HC_2<-"https://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_2.bw"
+HC_3<-"https://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_3.bw"
+HC_4<-"https://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_4.bw"
+CAD_1<-"https://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_1.bw"
+CAD_2<-"https://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_2.bw"
+CAD_3<-"https://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_3.bw"
+CAD_4<-"https://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_4.bw"
 
 # fitqwr2.cqn<-readRDS("./Macrophage_fitqwr2cqn.Rds")
 # tryCatch(
