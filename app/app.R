@@ -98,7 +98,11 @@ server<-function(input,output,session){
     # if (!is.null(idx)) plotCounts( dds, idx ,"Group")
     tryCatch(
       if ((nrow(clicked())>0)){
-        plotCounts( dds, input$Gene ,"Group")
+        # plotCounts( dds, input$Gene ,"Group")
+        ggplot() +
+          geom_point(data = vstNormalizedCounts_Macrophage[vstNormalizedCounts_Macrophage$Peaks %in% input$Gene,],
+                     aes(x=Group, y=vstNormalizedCounts, color = Group )) +
+          scale_color_manual(values= c("blue","red"))
       }
       else{
         textOutput("Please select a region in MA plot")

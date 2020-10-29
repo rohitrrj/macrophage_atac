@@ -40,14 +40,17 @@ CAD_2<-"https://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/
 CAD_3<-"https://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_3.bw"
 CAD_4<-"https://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_4.bw"
 
+File_location <- "."
+
 # fitqwr2.cqn<-readRDS("./Macrophage_fitqwr2cqn.Rds")
 # tryCatch(
 #   restore.session("./Tuantuan_Run2_Differential.Rda"),
 #   error=function(e) e
 # )
 
+vstNormalizedCounts_Macrophage <- read.table(paste0(File_location,"/","vstNormalizedCounts_Macrophage.txt"),header = T)
+
 comparison <- "HCvsCAD"
-File_location <- "."
 ymax <- 8
 xloc <- 6 # px
 yloc <- 6 # py
