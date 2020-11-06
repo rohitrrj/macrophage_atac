@@ -105,7 +105,7 @@ server<-function(input,output,session){
         ggplot() +
           geom_point(data = vstNormalizedCounts_Macrophage[vstNormalizedCounts_Macrophage$Peaks %in% input$Gene,],
                      aes(x=Group, y=vstNormalizedCounts, color = Group )) +
-          scale_color_manual(values= c("blue","red"))
+          scale_color_manual(values= c("red","blue"))
       }
       else{
         textOutput("Please select a region in MA plot")
