@@ -1,5 +1,8 @@
 library(shiny)
 library(shinydashboard)
+library(httr)
+library(globals)
+library(future)
 
 source("analysis.R")
 
@@ -122,97 +125,36 @@ server<-function(input,output,session){
   })
   
   output$Track      <-  renderPlot({
-    distflank<-input$Flank
-    if(grepl(":", input$Gene)){
-      message("This is region")
-      clicked<-paste0(input$Gene,":-")
-      message(clicked)
-      Genes_toplot_gr<-grFromLocationString(clicked)
-    } 
-    else {
-      message("This is gene")
-      Genes<-input$Gene
-      Genes_toplot <- Genes
-      message(Genes_toplot)
-      entrezIDforGenes_toplot <- get(Genes_toplot, org.Hs.egSYMBOL2EG)
-      # Genes_toplot <- geneTrack(entrezIDforGenes_toplot,TxDb.Hsapiens.UCSC.hg19.knownGene,type = "gene")[[1]]
-      hg19_genes<-genes(TxDb.Hsapiens.UCSC.hg19.knownGene)
-      Genes_toplot_gr<-hg19_genes[hg19_genes$gene_id %in% entrezIDforGenes_toplot]
-      seqlevels(Genes_toplot_gr) <- seqlevelsInUse(Genes_toplot_gr)
-    }
-
-    Genes_toplot_gr<-Genes_toplot_gr + distflank
+    Track_list<-list(
+      HC_1 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_1.bw",
+      HC_2 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_2.bw",
+      HC_3 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_3.bw",
+      HC_4 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_4.bw",
+      CAD_1 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_1.bw",
+      CAD_2 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_2.bw",
+      CAD_3 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_3.bw",
+      CAD_4 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_4.bw"
+    )
     
-    seqlevelsStyle(Genes_toplot_gr) <- "UCSC"
+    Track_cols<-c("blue","blue","blue","blue","red","red","red","red")
     
-    HC_1 <- importScore(file = HC_1, format="BigWig",ranges = Genes_toplot_gr)
-    HC_2 <- importScore(file = HC_2, format="BigWig",ranges = Genes_toplot_gr)
-    HC_3 <- importScore(file = HC_3, format="BigWig",ranges = Genes_toplot_gr)
-    HC_4 <- importScore(file = HC_4, format="BigWig",ranges = Genes_toplot_gr)
+    url <- "https://atac-tracks-api-e2gbey6dba-uw.a.run.app"
     
-    CAD_1 <- importScore(file = CAD_1, format="BigWig",ranges = Genes_toplot_gr)
-    CAD_2 <- importScore(file = CAD_2, format="BigWig",ranges = Genes_toplot_gr)
-    CAD_3 <- importScore(file = CAD_3, format="BigWig",ranges = Genes_toplot_gr)
-    CAD_4 <- importScore(file = CAD_4, format="BigWig",ranges = Genes_toplot_gr)
+    body <- list(
+      distflank = input$Flank,
+      Genes = input$Gene,
+      Track_list = Track_list,
+      Track_cols = Track_cols
+    )
     
-    setTrackStyleParam(HC_1, "color", c("blue","blue"))
-    setTrackStyleParam(HC_2, "color", c("blue","blue"))
-    setTrackStyleParam(HC_3, "color", c("blue","blue"))
-    setTrackStyleParam(HC_4, "color", c("blue","blue"))
+    path <- 'atacTracks'
     
-    setTrackStyleParam(CAD_1, "color", c("red","red"))
-    setTrackStyleParam(CAD_2, "color", c("red","red"))
-    setTrackStyleParam(CAD_3, "color", c("red","red"))
-    setTrackStyleParam(CAD_4, "color", c("red","red"))
+    raw.result %<-% POST(url = url, path = path, body = body, encode = 'json')
     
-    y_max<-ceiling(max(c(HC_1$dat$score,HC_2$dat$score,HC_3$dat$score,HC_4$dat$score,
-                         CAD_1$dat$score,CAD_2$dat$score,CAD_3$dat$score,CAD_4$dat$score)))
+    apiIn %<-% base::unserialize(httr::content(raw.result))
     
-    setTrackStyleParam(HC_1, "ylim", c(0,y_max))
-    setTrackStyleParam(HC_2, "ylim", c(0,y_max))
-    setTrackStyleParam(HC_3, "ylim", c(0,y_max))
-    setTrackStyleParam(HC_4, "ylim", c(0,y_max))
+    vp %<-% viewTracks(apiIn$tracks, gr=apiIn$geneRegion, viewerStyle=apiIn$view)
     
-    setTrackStyleParam(CAD_1, "ylim", c(0,y_max))
-    setTrackStyleParam(CAD_2, "ylim", c(0,y_max))
-    setTrackStyleParam(CAD_3, "ylim", c(0,y_max))
-    setTrackStyleParam(CAD_4, "ylim", c(0,y_max))
-    
-    # setTrackStyleParam(Genes_toplot, "ylabpos", 'upstream')
-    # setTrackStyleParam(Genes_toplot, "color", 'black')
-    # setTrackYaxisParam(Genes_toplot, "gp", list(col = "black", lty = "solid", lwd = 3, fontsize = 32))
-    # 
-    t <- try(Refseq_Genes <- geneModelFromTxdb(TxDb.Hsapiens.UCSC.hg19.knownGene,
-                                      org.Hs.eg.db,
-                                      gr=Genes_toplot_gr))
-    if ("try-error" %in% class(t)){
-      optSty <- optimizeStyle(trackList(HC_1, HC_2, HC_3, HC_4, CAD_1, CAD_2, CAD_3, CAD_4), theme=NULL)
-      trackList <- optSty$tracks
-      viewerStyle <- optSty$style
-      vp <- viewTracks(trackList, gr=Genes_toplot_gr, viewerStyle=viewerStyle)
-    }
-    else {
-      Refseq_Genes_names<-c()
-    for (i in 1:length(Refseq_Genes)){
-      setTrackStyleParam(Refseq_Genes[[i]], "ylabpos", "upstream")
-      setTrackStyleParam(Refseq_Genes[[i]], "ylabgp", list(cex=.6))
-      setTrackStyleParam(Refseq_Genes[[i]], "color", 'black')
-      setTrackYaxisParam(Refseq_Genes[[i]], "gp", list(col = "black", lty = "solid", lwd = 3, fontsize = 32))
-      Refseq_Genes_names<-c(Refseq_Genes_names,paste0(Refseq_Genes[[i]]$dat$symbol,"::",Refseq_Genes[[i]]$dat$transcript)[1])
-    }
-    names(Refseq_Genes)<-Refseq_Genes_names
-
-    # eval(parse(text=(paste("obj<-list(",Genes,"=Genes_toplot,Transcripts=Refseq_Genes)",sep=""))))
-    
-    eval(parse(text=(paste("obj<-list(","Transcripts=Refseq_Genes)",sep=""))))
-    
-    # eval(parse(text=(paste("obj<-list(",Genes,"=Genes_toplot)",sep=""))))
-    
-    optSty <- optimizeStyle(trackList(obj[1], HC_1, HC_2, HC_3, HC_4, CAD_1, CAD_2, CAD_3, CAD_4), theme=NULL)
-    trackList <- optSty$tracks
-    viewerStyle <- optSty$style
-    vp <- viewTracks(trackList, gr=Genes_toplot_gr, viewerStyle=viewerStyle)
-    }
   })
 }
 

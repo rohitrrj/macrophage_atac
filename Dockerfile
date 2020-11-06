@@ -12,10 +12,8 @@ RUN apt-get install --yes wget libncurses5-dev zlib1g-dev libbz2-dev liblzma-dev
 
 # Install R packages that are required
 # TODO: add further package if you need!
-RUN R -e "install.packages(c('shiny', 'shinydashboard','jpeg','Hmisc','BiocManager','githubinstall'), repos='http://cran.rstudio.com/')"
-RUN R -e "BiocManager::install(c('biomaRt','GenomicFeatures','Gviz','rtracklayer','trackViewer','org.Hs.eg.db','TxDb.Hsapiens.UCSC.hg19.knownGene'))"
-RUN R -e "library(githubinstall); githubinstall(c('FusionExpressionPlot'),ask=F)"
-RUN R -e "install.packages(c('ggplot2'), repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages(c('shinydashboard','httr','globals','future','BiocManager','githubinstall'), repos='http://cran.rstudio.com/')"
+RUN R -e "BiocManager::install(c('trackViewer'))"
 
 ADD app /srv/shiny-server/
 

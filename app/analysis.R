@@ -1,15 +1,15 @@
 # ### analysis.R ###
 
-library(Gviz)
-library(rtracklayer)
+# library(Gviz)
+# library(rtracklayer)
 library(trackViewer)
-library(org.Hs.eg.db)
-library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+# library(org.Hs.eg.db)
+# library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 # library(session)
 # library(limma)
 # library(car)
 # library(githubinstall)
-library(FusionExpressionPlot)
+# library(FusionExpressionPlot)
 library(ggplot2)
 # library(DESeq2)
 
