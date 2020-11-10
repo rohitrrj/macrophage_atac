@@ -100,6 +100,15 @@ server<-function(input,output,session){
   #get the clicked points!
   clicked <- reactive({
     # We need to tell it what the x and y variables are:
+    comparison <- input$Comparison
+    ymax <- 8
+    xloc <- 6 # px
+    yloc <- 6 # py
+    tops <- read.table(paste0(File_location,"/",comparison,".txt"),header = T)
+    tops$Significance<-"NA"
+    tops[tops$adj.P.Val <= 0.05,"Significance"]<-"< 0.05"
+    tops[tops$adj.P.Val > 0.05,"Significance"]<-"> 0.05"
+    
     nearPoints(tops, input$plotma_click, xvar = "AveExpr", yvar = "logFC")
     # updateTextInput(session, "Gene", value = paste(rownames(clicked()[1,])))
   })
@@ -151,7 +160,7 @@ server<-function(input,output,session){
     if((grepl(":", input$Gene)==F) && (input$Gene %notin% UCSC.hg19.genes$V1)){
       return(plot_exception("Please enter a valid Gene Symbol or region."))
     } else {
-      showModal(modalDialog("Loading Tracks", footer=NULL))
+      # showModal(modalDialog("Loading Tracks", footer=NULL))
       tryCatch({
         Track_list<-list(
           CAD_4 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_4.bw",
@@ -164,7 +173,7 @@ server<-function(input,output,session){
           HC_1 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_1.bw"
         )
         
-        Track_cols<-c("blue","blue","blue","blue","red","red","red","red")
+        Track_cols<-c("red","red","red","red","blue","blue","blue","blue")
         
         url <- "https://atac-tracks-api-e2gbey6dba-uw.a.run.app"
         
@@ -204,7 +213,7 @@ server<-function(input,output,session){
         
       }
       )
-      removeModal()
+      # removeModal()
     }
   })
 }
