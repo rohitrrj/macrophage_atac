@@ -5,12 +5,16 @@ library(globals)
 library(future)
 
 source("analysis.R")
+source("plot_exception.R")
 
 size = 450
 
 ui<-dashboardPage(
   dashboardHeader(title = "CAD Macrophage ATAC-seq"),
-  dashboardSidebar(textInput(inputId = "Gene",
+  dashboardSidebar(selectInput(inputId = "Comparison",
+                               label = "Differential Comparisons",
+                               choices = c("HC vs CAD" = "HCvsCAD")),
+                   textInput(inputId = "Gene",
                              label = "Gene Symbol",
                              value = "STAT1"),
                    sliderInput(inputId = "Flank",
@@ -20,7 +24,7 @@ ui<-dashboardPage(
   ),
   dashboardBody(
     fluidRow(
-    box(title = "Healthy Vs CAD",
+    box(title = "MA Plot",
     # the MA-plot
     plotOutput("plotma", click="plotma_click"),# width=size, height=size),
     collapsible = TRUE),
@@ -44,23 +48,42 @@ ui<-dashboardPage(
 
 server<-function(input,output,session){
 
-  observeEvent(input$neg10K,{
-    print(as.numeric(input$neg10K))
-  })
-  
-  observeEvent(input$pos10K,{
-    print(as.numeric(input$pos10K))
-  })
-  
+  # observeEvent(input$neg10K,{
+  #   print(as.numeric(input$neg10K))
+  # })
+  # 
+  # observeEvent(input$pos10K,{
+  #   print(as.numeric(input$pos10K))
+  # })
+  # 
   # MA-plot of all genes
   output$plotma     <-  renderPlot({
-    # par(mar=c(5,5,3,2),cex.lab=2,cex.main=2,cex.axis=1.5)
+    comparison <- input$Comparison
+    ymax <- 8
+    xloc <- 6 # px
+    yloc <- 6 # py
+    # tops<-topTable(fitqwr2.cqn, coef = comparison, number = Inf,sort.by = "none")
+    # write.table(x = tops,file = "./HCvsCAD.txt",row.names = T,col.names = T,quote = F,sep = '\t')
+    tops <- read.table(paste0(File_location,"/",comparison,".txt"),header = T)
+    tops$Significance<-"NA"
+    tops[tops$adj.P.Val <= 0.05,"Significance"]<-"< 0.05"
+    tops[tops$adj.P.Val > 0.05,"Significance"]<-"> 0.05"
+    tops_sig<-subset(tops,adj.P.Val<0.05)
+    tops_sig_up<-subset(tops_sig,logFC>0)
+    tops_sig_down<-subset(tops_sig,logFC < 0)
+    tops_not_sig<-subset(tops,adj.P.Val>=0.05)
+    PvsU_up<-tops_sig_up
+    PvsU_down<-tops_sig_down
+    PvsU_not_sig<-tops_not_sig
+    tops_sig_mod<-tops_sig_up
+    tops_sig_mod<-rbind(tops_sig_mod,tops_sig_down)
     
     ggplot(tops,aes(x=AveExpr, y=logFC, color=Significance,ymin = -ymax, ymax = ymax)) +
       geom_point() +
       coord_cartesian() +
       ylab("log2 FC") +
-      xlab("log2 Normalized Reads")
+      xlab("log2 Normalized Reads") +
+      ggtitle(gsub("vs"," vs ",input$Comparison))
     
     # message("Up=",nrow(tops_sig_up))
     # message("Down=",nrow(tops_sig_down))
@@ -115,8 +138,8 @@ server<-function(input,output,session){
   })
   
   output$hover_info <- renderPrint({
-    if(!is.null(input$plot_hover)){
-      hover=input$plot_hover
+    if(!is.null(input$plotcounts)){
+      hover=input$plotcounts
       dist=sqrt((hover$x-vstNormalizedCounts_Macrophage$Group)^2+(hover$y-vstNormalizedCounts_Macrophage$vstNormalizedCounts)^2)
       cat("SampleID: \n")
       if(min(dist) < 3)
@@ -125,37 +148,64 @@ server<-function(input,output,session){
   })
   
   output$Track      <-  renderPlot({
-    Track_list<-list(
-      HC_1 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_1.bw",
-      HC_2 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_2.bw",
-      HC_3 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_3.bw",
-      HC_4 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_4.bw",
-      CAD_1 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_1.bw",
-      CAD_2 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_2.bw",
-      CAD_3 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_3.bw",
-      CAD_4 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_4.bw"
-    )
-    
-    Track_cols<-c("blue","blue","blue","blue","red","red","red","red")
-    
-    url <- "https://atac-tracks-api-e2gbey6dba-uw.a.run.app"
-    
-    body <- list(
-      distflank = input$Flank,
-      Genes = input$Gene,
-      Track_list = Track_list,
-      Track_cols = Track_cols
-    )
-    
-    path <- 'atacTracks'
-    
-    raw.result %<-% POST(url = url, path = path, body = body, encode = 'json')
-    
-    apiIn %<-% base::unserialize(httr::content(raw.result))
-    
-    vp %<-% viewTracks(apiIn$tracks, gr=apiIn$geneRegion, viewerStyle=apiIn$view)
-    
+    if((grepl(":", input$Gene)==F) && (input$Gene %notin% UCSC.hg19.genes$V1)){
+      return(plot_exception("Please enter a valid Gene Symbol or region."))
+    } else {
+      showModal(modalDialog("Loading Tracks", footer=NULL))
+      tryCatch({
+        Track_list<-list(
+          CAD_4 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_4.bw",
+          CAD_3 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_3.bw",
+          CAD_2 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_2.bw",
+          CAD_1 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/CAD_1.bw",
+          HC_4 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_4.bw",
+          HC_3 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_3.bw",
+          HC_2 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_2.bw",
+          HC_1 = "http://storage.googleapis.com/gbsc-gcp-lab-jgoronzy_group/Rohit/Tracks/macrophage/HC_1.bw"
+        )
+        
+        Track_cols<-c("blue","blue","blue","blue","red","red","red","red")
+        
+        url <- "https://atac-tracks-api-e2gbey6dba-uw.a.run.app"
+        
+        body <- list(
+          distflank = input$Flank,
+          Genes = input$Gene,
+          Track_list = Track_list,
+          Track_cols = Track_cols
+        )
+        
+        path <- 'atacTracks'
+        
+        raw.result %<-% POST(url = url, path = path, body = body, encode = 'json')
+        
+        apiIn %<-% base::unserialize(httr::content(raw.result))
+        
+        numTracks<-length(Track_list)
+        numAll<-length(names(apiIn$tracks))
+        j=1
+        for(i in ((numAll-numTracks)+1):numAll){
+          names(apiIn$tracks)[i]<-gsub("_","-",names(apiIn$tracks)[i])
+          names(apiIn$tracks)[i]<-paste0("\t",names(apiIn$tracks)[i])
+          setTrackStyleParam(apiIn$tracks[[i]], "ylabpos", "bottomleft")
+          setTrackStyleParam(apiIn$tracks[[i]], "ylabgp", list(cex=1, col=Track_cols[j]))
+          j=j+1
+        }
+        
+        
+        vp %<-% viewTracks(apiIn$tracks, gr=apiIn$geneRegion, viewerStyle=apiIn$view)
+      }, warning = function(war) {
+        
+        # warning handler picks up where error was generated
+        message("Tracks could not be loaded!")
+        
+      }, error = function(err) {
+        message("Tracks could not be loaded!")
+        
+      }
+      )
+      removeModal()
+    }
   })
 }
-
 shinyApp(ui = ui,server = server)
