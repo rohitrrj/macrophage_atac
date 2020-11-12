@@ -18,7 +18,11 @@ ui<-dashboardPage(
                              label = "Gene Symbol",
                              value = "STAT1"),
                    sliderInput(inputId = "Flank",
-                               label = "Zoom",min = 0,max = 100000,value = 10000)
+                               label = "Zoom",
+                               min = 0,max = 50000,
+                               value = 10000,step = 10000,
+                               pre = "x", sep = ",",
+                               animate = F)
                    # ,actionButton(inputId = "neg10K", label = "< 10k")
                    # ,actionButton(inputId = "pos10K", label = "> 10k")
   ),
