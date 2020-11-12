@@ -1,0 +1,28 @@
+# cloudbuild.yaml for macrophage atac.
+# This file is used by the Cloud Build trigger that builds this image.
+
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/gbsc-gcp-lab-jgoronzy/macrophage', '.']
+  timeout: 3600s
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', '--image', 'gcr.io/gbsc-gcp-lab-jgoronzy/macrophage']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+      [
+        'beta',
+        'run',
+        'deploy',
+        'macrophage',
+        '--image',
+        'gcr.io/gbsc-gcp-lab-jgoronzy/macrophage',
+        '--region',
+        'us-west1',
+        '--platform',
+        'managed',
+        '--quiet',
+      ]
+images: ['gcr.io/gbsc-gcp-lab-jgoronzy/macrophage']
+timeout: '3600s'
+options:
+  machineType: 'N1_HIGHCPU_8'
