@@ -27,8 +27,8 @@ An interactive R Shiny application for visualizing and analyzing ATAC-seq data f
 
 Using Docker:
 ```bash
-docker pull yourusername/macrophage-atac
-docker run -p 3838:3838 yourusername/macrophage-atac
+docker pull rohitrrj/macrophage-atac
+docker run -p 3838:3838 rohitrrj/macrophage-atac
 ```
 
 The app will be available at: http://localhost:3838
@@ -38,7 +38,7 @@ The app will be available at: http://localhost:3838
 ### Local Installation
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/macrophage_atac.git
+git clone https://github.com/rohitrrj/macrophage_atac.git
 cd macrophage_atac
 ```
 
@@ -163,11 +163,23 @@ Modify `app/app.R` for:
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Citation
-If you use this application in your research, please cite:
-```
-Author et al. (Year). Macrophage ATAC-seq Visualization: An interactive tool for analyzing chromatin accessibility.
-```
+## Applications
+This visualization tool has been used in the following publications:
+
+1. "PD-1 combination therapy with IL-2 modifies CD8+ T cell exhaustion program"
+   - *Nature*. 2022 Oct;610(7933):737-743
+   - DOI: [10.1038/s41586-022-05257-0](https://doi.org/10.1038/s41586-022-05257-0)
+   - PMID: [36215562](https://pubmed.ncbi.nlm.nih.gov/36215562)
+   - Used for visualizing chromatin accessibility changes in exhausted T cells
+
+2. "Epigenetic signature of PD-1+ TCF1+ CD8 T cells that act as resource cells during chronic viral infection"
+   - *Proc Natl Acad Sci U S A*. 2022 Feb 22;119(8):e2117314119
+   - DOI: [10.1073/pnas.2117314119](https://doi.org/10.1073/pnas.2117314119)
+   - PMID: [35085847](https://pubmed.ncbi.nlm.nih.gov/35085847)
+   - Used for interactive exploration of ATAC-seq peaks in T cell subsets
+
+Code availability:
+⭐ [rohitrrj/macrophage_atac](https://github.com/rohitrrj/macrophage_atac) - Interactive visualization app for ATAC-seq data analysis
 
 ## Acknowledgments
 - Data processing pipeline: [ATACseq_Pipeline](../ATACseq_Pipeline)
